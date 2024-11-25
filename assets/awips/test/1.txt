@@ -1,0 +1,50 @@
+115
+WUUS55 KPSR 080530
+SVRPSR
+CAC025-065-080615-
+/O.NEW.KPSR.SV.W.0140.240908T0530Z-240908T0615Z/
+
+BULLETIN - IMMEDIATE BROADCAST REQUESTED
+Severe Thunderstorm Warning
+National Weather Service Phoenix AZ
+1030 PM PDT Sat Sep 7 2024
+
+The National Weather Service in Phoenix has issued a
+
+- Severe Thunderstorm Warning for...
+  Northeastern Imperial County in southeastern California...
+  Riverside County in southern California...
+
+- Until 1115 PM PDT.
+
+- At 1030 PM PDT, a severe thunderstorm was located 19 miles west of
+  Palo Verde, or 28 miles southeast of Desert Center, and is nearly
+  stationary.
+
+  HAZARD...60 mph wind gusts.
+
+  SOURCE...Radar indicated.
+
+  IMPACT...Expect damage to roofs, siding, and trees.
+
+- This severe thunderstorm will remain over mainly rural areas of
+  northeastern Imperial and Riverside Counties.
+
+PRECAUTIONARY/PREPAREDNESS ACTIONS...
+
+For your protection move to an interior room on the lowest floor of a
+building.
+
+&&
+
+LAT...LON 3334 11511 3343 11519 3350 11503 3339 11495
+TIME...MOT...LOC 0530Z 063DEG 1KT 3341 11507
+
+HAIL THREAT...RADAR INDICATED
+MAX HAIL SIZE...<.75 IN
+WIND THREAT...RADAR INDICATED
+MAX WIND GUST...60 MPH
+
+$$
+
+TW
