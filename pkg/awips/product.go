@@ -2,7 +2,6 @@ package awips
 
 import (
 	"errors"
-	"log/slog"
 	"regexp"
 	"strings"
 	"time"
@@ -43,15 +42,51 @@ type TextProductSegment struct {
 // Attempts to parse the given text into a text product including segments & VTEC
 func New(text string) (*TextProduct, error) {
 
-	var err error
-
 	// Get the AWIPS header
 	awips, err := ParseAWIPS(text)
 	if err != nil {
 		return nil, err
 	}
 
+	issued, err := GetIssuedTime(text)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get the WMO header
+	wmo, err := ParseWMO(text)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: Decide if we actually need this
+	// bilRegexp := regexp.MustCompile("(?m:^(BULLETIN - |URGENT - |EAS ACTIVATION REQUESTED|IMMEDIATE BROADCAST REQUESTED|FLASH - |REGULAR - |HOLD - |TEST...)(.*))")
+	// bil := bilRegexp.FindString(text)
+
+	segments, e := GetSegments(text, issued)
+	if len(e) != 0 {
+		return nil, e[0]
+	}
+
+	product := TextProduct{
+		Text:     text,
+		WMO:      wmo,
+		AWIPS:    awips,
+		Issued:   issued,
+		Office:   awips.WFO,
+		Product:  awips.Product,
+		Segments: segments,
+	}
+
+	return &product, nil
+}
+
+/*
+Attempts to find a product issuing datetime string in the provided text. If a match is found, it may be disseminated. Otherwise, if all else fails, returns time zero.
+*/
+func GetIssuedTime(text string) (time.Time, error) {
 	var issued time.Time
+	var err error
 
 	// Find when the product was issued
 	issuedRegexp := regexp.MustCompile("[0-9]{3,4} ((AM|PM) [A-Za-z]{3,4}|UTC) ([A-Za-z]{3} ){2}[0-9]{1,2} [0-9]{4}")
@@ -72,7 +107,7 @@ func New(text string) (*TextProduct, error) {
 			tzString := strings.ToUpper(strings.Split(issuedString, " ")[2])
 			tz := utils.Timezones[tzString]
 			if tz == nil {
-				return nil, errors.New("missing timezone " + tzString + " AWIPS: " + awips.Original)
+				return issued, errors.New("missing timezone " + tzString + " in issued string")
 			}
 			split := strings.Split(issuedString, " ")
 			t := split[0]
@@ -85,29 +120,19 @@ func New(text string) (*TextProduct, error) {
 		}
 
 		if err != nil {
-			return nil, errors.New("could not parse issued date line for AWIPS: " + awips.Original)
+			return issued, errors.New("could not parse issued date line")
 		}
-	} else {
-		slog.Warn("Issue date was not found. Defaulting to UTC now")
-		issued = time.Now().UTC()
 	}
 
-	issued = issued.UTC()
+	return issued, nil
+}
 
-	// Get the WMO header
-	wmo, err := ParseWMO(text)
-	if err != nil {
-		return nil, err
-	}
-
-	// TODO: Decide if we actually need this
-	// bilRegexp := regexp.MustCompile("(?m:^(BULLETIN - |URGENT - |EAS ACTIVATION REQUESTED|IMMEDIATE BROADCAST REQUESTED|FLASH - |REGULAR - |HOLD - |TEST...)(.*))")
-	// bil := bilRegexp.FindString(text)
-
+func GetSegments(text string, issued time.Time) ([]TextProductSegment, []error) {
 	// Segment the product
 	splits := strings.Split(text, "$$")
 
 	segments := []TextProductSegment{}
+	errors := []error{}
 
 	for _, segment := range splits {
 		segment = strings.TrimSpace(segment)
@@ -119,7 +144,8 @@ func New(text string) (*TextProduct, error) {
 
 		ugc, err := ParseUGC(segment)
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
+			return nil, errors
 		}
 		if ugc != nil {
 			ugc.Merge(issued)
@@ -128,17 +154,19 @@ func New(text string) (*TextProduct, error) {
 		// Find any VTECs that the segment may have
 		vtec, e := ParseVTEC(segment)
 		if len(e) != 0 {
-			for _, er := range e {
-				slog.Error(er.Error())
-			}
+			errors = append(errors, e...)
 		}
 
 		latlon, err := ParseLatLon(text)
 		if err != nil {
-			return nil, err
+			errors = append(errors, err)
+			return nil, errors
 		}
 
-		tags := ParseTags(text)
+		tags, e := ParseTags(text)
+		if len(e) != 0 {
+			errors = append(errors, e...)
+		}
 
 		segments = append(segments, TextProductSegment{
 			Text:   segment,
@@ -150,17 +178,7 @@ func New(text string) (*TextProduct, error) {
 
 	}
 
-	product := TextProduct{
-		Text:     text,
-		WMO:      wmo,
-		AWIPS:    awips,
-		Issued:   issued,
-		Office:   awips.WFO,
-		Product:  awips.Product,
-		Segments: segments,
-	}
-
-	return &product, nil
+	return segments, nil
 }
 
 func (product *TextProduct) HasVTEC() bool {
@@ -174,11 +192,6 @@ func (product *TextProduct) HasVTEC() bool {
 
 func (segment *TextProductSegment) HasVTEC() bool {
 	return len(segment.VTEC) != 0
-}
-
-func (segment *TextProductSegment) VTECProduct() error {
-
-	return nil
 }
 
 func (segment *TextProductSegment) HasUGC() bool {

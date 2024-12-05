@@ -2,7 +2,6 @@ package awips
 
 import (
 	"fmt"
-	"log/slog"
 	"regexp"
 	"strings"
 )
@@ -73,7 +72,9 @@ var tags = []tagOpt{
 	},
 }
 
-func ParseTags(text string) map[string]string {
+func ParseTags(text string) (map[string]string, []error) {
+	err := []error{}
+
 	output := make(map[string]string)
 	for _, tag := range tags {
 		regex := regexp.MustCompile(tag.Regexp)
@@ -95,7 +96,7 @@ func ParseTags(text string) map[string]string {
 			}
 
 			if !valid {
-				slog.Warn(fmt.Sprintf("Unusual tag found for %s: %s", tag.Tag, value))
+				err = append(err, fmt.Errorf("unusual tag found for %s: %s", tag.Tag, value))
 			}
 		}
 
@@ -103,5 +104,5 @@ func ParseTags(text string) map[string]string {
 
 	}
 
-	return output
+	return output, err
 }
