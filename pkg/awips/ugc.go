@@ -46,7 +46,7 @@ func ParseUGC(text string) (*UGC, error) {
 	// Get the expiry time
 	expires, err := time.Parse("021504", segments[len(segments)-1])
 	if err != nil {
-		return nil, errors.New("could not parse UGC datetime")
+		return nil, errors.New("could not parse UGC expiry: " + err.Error())
 	}
 	segments = segments[:len(segments)-1]
 
@@ -69,16 +69,17 @@ func ParseUGC(text string) (*UGC, error) {
 			s = s[3:]
 		}
 
+		// TODO: Implement 000 and ALL
 		// Get the range of the zones/counties
 		if bracketRegexp.MatchString(s) {
 			start, err := strconv.Atoi(s[:3])
 			if err != nil {
-				return nil, errors.New("could not parse UGC int")
+				return nil, errors.New("could not parse UGC int: " + err.Error())
 			}
 
 			end, err := strconv.Atoi(s[4:])
 			if err != nil {
-				return nil, errors.New("could not parse UGC int")
+				return nil, errors.New("could not parse UGC int: " + err.Error())
 			}
 
 			for i := start; i <= end; i++ {
