@@ -22,8 +22,6 @@ type TextProduct struct {
 	WMO      WMO                  `json:"wmo"`
 	AWIPS    AWIPS                `json:"awips"`
 	Issued   time.Time            `json:"issued"`
-	Expires  time.Time            `json:"expires"` // The product expiry time as defined in NWS Directive 10-1701
-	Ends     time.Time            `json:"ends"`    // The event end time as defined in NWS Directive 10-1701
 	Office   string               `json:"office"`
 	Product  string               `json:"product"`
 	Segments []TextProductSegment `json:"segments"`
@@ -31,12 +29,14 @@ type TextProduct struct {
 
 // A text product segment
 type TextProductSegment struct {
-	Text   string            `json:"text"`
-	VTEC   []VTEC            `json:"vtec"`
-	UGC    *UGC              `json:"ugc"`
-	LatLon *LatLon           `json:"latlon"`
-	Tags   map[string]string `json:"tags"`
-	TML    *TML              `json:"tml"`
+	Text    string            `json:"text"`
+	VTEC    []VTEC            `json:"vtec"`
+	UGC     *UGC              `json:"ugc"`
+	Expires time.Time         `json:"expires"` // The product expiry time as defined in NWS Directive 10-1701
+	Ends    time.Time         `json:"ends"`    // The event end time as defined in NWS Directive 10-1701
+	LatLon  *LatLon           `json:"latlon"`
+	Tags    map[string]string `json:"tags"`
+	TML     *TML              `json:"tml"`
 }
 
 // Attempts to parse the given text into a text product including segments & VTEC
@@ -63,7 +63,7 @@ func New(text string) (*TextProduct, error) {
 	// bilRegexp := regexp.MustCompile("(?m:^(BULLETIN - |URGENT - |EAS ACTIVATION REQUESTED|IMMEDIATE BROADCAST REQUESTED|FLASH - |REGULAR - |HOLD - |TEST...)(.*))")
 	// bil := bilRegexp.FindString(text)
 
-	segments, e := GetSegments(text, issued)
+	segments, e := GetSegments(text, issued, wmo)
 	if len(e) != 0 {
 		return nil, e[0]
 	}
@@ -127,7 +127,7 @@ func GetIssuedTime(text string) (time.Time, error) {
 	return issued, nil
 }
 
-func GetSegments(text string, issued time.Time) ([]TextProductSegment, []error) {
+func GetSegments(text string, issued time.Time, wmo WMO) ([]TextProductSegment, []error) {
 	// Segment the product
 	splits := strings.Split(text, "$$")
 
@@ -147,7 +147,12 @@ func GetSegments(text string, issued time.Time) ([]TextProductSegment, []error) 
 			errors = append(errors, err)
 			return nil, errors
 		}
+		expires := time.Now().UTC()
 		if ugc != nil {
+			expires = time.Date(issued.Year(), issued.Month(), ugc.Expires.Day(), ugc.Expires.Hour(), ugc.Expires.Minute(), 0, 0, time.UTC)
+			if ugc.Expires.Day() > wmo.Issued.Day() && ugc.Expires.Day() == 1 {
+				expires = expires.AddDate(0, 1, 0)
+			}
 			ugc.Merge(issued)
 		}
 
@@ -169,11 +174,12 @@ func GetSegments(text string, issued time.Time) ([]TextProductSegment, []error) 
 		}
 
 		segments = append(segments, TextProductSegment{
-			Text:   segment,
-			VTEC:   vtec,
-			UGC:    ugc,
-			LatLon: latlon,
-			Tags:   tags,
+			Text:    segment,
+			VTEC:    vtec,
+			UGC:     ugc,
+			Expires: expires,
+			LatLon:  latlon,
+			Tags:    tags,
 		})
 
 	}
