@@ -69,7 +69,6 @@ func ParseUGC(text string) (*UGC, error) {
 			s = s[3:]
 		}
 
-		// TODO: Implement 000 and ALL
 		// Get the range of the zones/counties
 		if bracketRegexp.MatchString(s) {
 			start, err := strconv.Atoi(s[:3])
