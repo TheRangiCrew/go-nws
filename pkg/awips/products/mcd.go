@@ -1,6 +1,7 @@
 package products
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -12,14 +13,28 @@ import (
 
 type MCD struct {
 	Original         string               `json:"original"`
+	Number           int                  `json:"number"`
 	Issued           time.Time            `json:"issued"`
 	Expires          time.Time            `json:"expires"`
 	Concerning       string               `json:"concerning"`
 	Polygon          awips.PolygonFeature `json:"polygon"`
-	WatchProbability int                  `json:"watch_probability,omitempty"`
+	WatchProbability int                  `json:"watch_probability"`
 }
 
 func ParseMCD(text string) (*MCD, error) {
+
+	valueRegexp := regexp.MustCompile("([0-9]+)")
+
+	mcdRegex := regexp.MustCompile("(Mesoscale Discussion )([0-9]{4})")
+	mcdString := mcdRegex.FindString(text)
+	numberString := valueRegexp.FindString(mcdString)
+	if numberString == "" {
+		return nil, errors.New("error parsing mcd: No MCD number found")
+	}
+	number, err := strconv.Atoi(numberString)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing mcd number: %s", err.Error())
+	}
 
 	validRegex := regexp.MustCompile("(Valid|VALID) ([0-9]{6}Z) - ([0-9]{6}Z)\n")
 	validString := strings.TrimSpace(validRegex.FindString(text))
@@ -57,30 +72,28 @@ func ParseMCD(text string) (*MCD, error) {
 
 	probabilityRegexp := regexp.MustCompile(`(Probability of Watch Issuance\.\.\.)(.+)`)
 	probabilityString := probabilityRegexp.FindString(text)
-	var probability *int
+	var probability int
 	if probabilityString != "" {
-		valueRegexp := regexp.MustCompile("([0-9]+)")
 		valueString := valueRegexp.FindString(probabilityString)
 
 		if valueString == "" {
 			return nil, fmt.Errorf("error parsing mcd: Found probability string but no numbers")
 		}
 
-		p, err := strconv.Atoi(valueString)
+		probability, err = strconv.Atoi(valueString)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing mcd probability: %s", err.Error())
 		}
-
-		probability = &p
 	}
 
 	mcd := MCD{
 		Original:         text,
+		Number:           number,
 		Issued:           issued,
 		Expires:          expires,
 		Concerning:       concerning,
 		Polygon:          *polygon,
-		WatchProbability: *probability,
+		WatchProbability: probability,
 	}
 
 	return &mcd, nil
