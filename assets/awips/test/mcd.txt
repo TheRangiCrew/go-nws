@@ -1,0 +1,45 @@
+439 
+ACUS11 KWNS 181529
+SWOMCD
+SPC MCD 181529 
+OKZ000-TXZ000-181730-
+
+Mesoscale Discussion 2233
+NWS Storm Prediction Center Norman OK
+0929 AM CST Mon Nov 18 2024
+
+Areas affected...northeast TX and far southeast OK
+
+Concerning...Severe potential...Watch unlikely 
+
+Valid 181529Z - 181730Z
+
+Probability of Watch Issuance...20 percent
+
+SUMMARY...A brief tornado and localized damaging wind threat will
+exist through early afternoon with mesovortices within a line of
+low-topped convection moving east-northeast across northeast Texas.
+A watch may be necessary if greater deepening into thunderstorms
+occurs.
+
+DISCUSSION...Several transient and generally weak mesovortices have
+been noted around the Metroplex with a largely north/south-oriented
+convective line moving east-northeastward. Low-level shear is quite
+strong ahead of the line per area VWPs and will remain so into early
+afternoon. Convective depth has been a limiting factor to more
+persistent/stronger mesovortices, with a lack of CG lightning
+production and echo tops to around 25k ft. It appears the northern
+tip of 67-68 F surface dew points may be necessary for a consistent
+severe threat. This should tend to ripple slowly southward into
+early afternoon as the convective line occludes the rich low-level
+moisture plume emanating north across east TX.
+
+..Grams/Smith.. 11/18/2024
+
+...Please see www.spc.noaa.gov for graphic product...
+
+ATTN...WFO...SHV...TSA...HGX...FWD...OUN...
+
+LAT...LON   32789687 33489682 33939649 34099583 33909504 33469499
+            32919497 32479503 32069524 31459567 31179641 31449690
+            32789687
