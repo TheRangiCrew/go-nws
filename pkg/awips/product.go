@@ -73,7 +73,7 @@ func New(text string) (*TextProduct, error) {
 		WMO:      wmo,
 		AWIPS:    awips,
 		Issued:   issued,
-		Office:   awips.WFO,
+		Office:   wmo.Office,
 		Product:  awips.Product,
 		Segments: segments,
 	}
