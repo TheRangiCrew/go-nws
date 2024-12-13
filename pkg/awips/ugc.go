@@ -43,10 +43,18 @@ func ParseUGC(text string) (*UGC, error) {
 	// Make it one long string and segment it
 	segments := strings.Split(strings.ReplaceAll(original, "\n", ""), "-")
 
+	var err error
+
 	// Get the expiry time
-	expires, err := time.Parse("021504", segments[len(segments)-1])
-	if err != nil {
-		return nil, errors.New("could not parse UGC expiry: " + err.Error())
+	expiryString := strings.TrimSpace(segments[len(segments)-1])
+	var expires time.Time
+	if expiryString == "123456" {
+		expires = time.Now()
+	} else {
+		expires, err = time.Parse("021504", expiryString)
+		if err != nil {
+			return nil, errors.New("could not parse UGC expiry: " + err.Error())
+		}
 	}
 	segments = segments[:len(segments)-1]
 
