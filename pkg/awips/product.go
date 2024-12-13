@@ -149,6 +149,7 @@ func GetSegments(text string, issued time.Time, wmo WMO) ([]TextProductSegment, 
 		}
 		expires := time.Now().UTC()
 		if ugc != nil {
+			// Trying to compensate for products expiring at the end of a month/year
 			expires = time.Date(issued.Year(), issued.Month(), ugc.Expires.Day(), ugc.Expires.Hour(), ugc.Expires.Minute(), 0, 0, time.UTC)
 			if ugc.Expires.Day() > wmo.Issued.Day() && ugc.Expires.Day() == 1 {
 				expires = expires.AddDate(0, 1, 0)
