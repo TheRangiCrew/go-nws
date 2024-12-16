@@ -58,7 +58,7 @@ var VTECPhenomena = map[string]string{
 	"FG": "Dense Fog",
 	"FL": "Flood",
 	"FR": "Frost",
-	"FW": "Red Flag",
+	"FW": "Fire Weather",
 	"FZ": "Freeze",
 	"UP": "Freezing Spray",
 	"GL": "Gale",
@@ -231,4 +231,23 @@ func ParseVTEC(text string) ([]VTEC, []error) {
 	}
 
 	return vtecs, err
+}
+
+func (vtec *VTEC) PhenomenaString() string {
+	switch vtec.Phenomena {
+	case "FW":
+		return "Red Flag"
+	}
+	return VTECPhenomena[vtec.Phenomena]
+}
+
+func (vtec *VTEC) SignificanceString() string {
+	return VTECPhenomena[vtec.Phenomena]
+}
+
+func (vtec *VTEC) Title(isEmergency bool) string {
+	if isEmergency {
+		return vtec.PhenomenaString() + " Emergency"
+	}
+	return vtec.PhenomenaString() + " " + vtec.SignificanceString()
 }
