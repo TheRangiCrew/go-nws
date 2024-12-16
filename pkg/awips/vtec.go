@@ -242,7 +242,7 @@ func (vtec *VTEC) PhenomenaString() string {
 }
 
 func (vtec *VTEC) SignificanceString() string {
-	return VTECPhenomena[vtec.Phenomena]
+	return VTECSignificance[vtec.Significance]
 }
 
 func (vtec *VTEC) Title(isEmergency bool) string {
