@@ -65,7 +65,7 @@ func ParsePoint(segments []string) (*[2]float64, error) {
 }
 
 func ParseLatLon(text string) (*LatLon, error) {
-	latlonRegexp := regexp.MustCompile(`(?m:^LAT\.\.\.LON\s+(\d+\s+)+)`)
+	latlonRegexp := regexp.MustCompile(`(?m)(^LAT\.\.\.LON\s+(\d+\s*)+)`)
 	original := latlonRegexp.FindString(text)
 
 	if original == "" {
