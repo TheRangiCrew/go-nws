@@ -246,8 +246,14 @@ func (vtec *VTEC) SignificanceString() string {
 }
 
 func (vtec *VTEC) Title(isEmergency bool) string {
+	title := vtec.PhenomenaString()
 	if isEmergency {
-		return vtec.PhenomenaString() + " Emergency"
+		title += " Emergency"
+	} else {
+		title += " " + vtec.SignificanceString()
 	}
-	return vtec.PhenomenaString() + " " + vtec.SignificanceString()
+	if (vtec.Phenomena == "SV" || vtec.Phenomena == "TO") && vtec.Significance == "A" {
+		title += " " + strconv.Itoa(vtec.EventNumber)
+	}
+	return title
 }
