@@ -8,21 +8,21 @@ import (
 
 type LatLon struct {
 	Original string          `json:"original"`
-	Points   [][2]float64    `json:"points"`
+	Points   [][]float64     `json:"points"`
 	Polygon  *PolygonFeature `json:"-"`
 }
 
 type PolygonFeature struct {
-	Type        string         `json:"type"` // Polygon
-	Coordinates [][][2]float64 `json:"coordinates"`
+	Type        string        `json:"type"` // Polygon
+	Coordinates [][][]float64 `json:"coordinates"`
 }
 
 type MultiPolygonFeature struct {
-	Type        string           `json:"type"` // MultiPolygon
-	Coordinates [][][][2]float64 `json:"coordinates"`
+	Type        string          `json:"type"` // MultiPolygon
+	Coordinates [][][][]float64 `json:"coordinates"`
 }
 
-func ParsePoint(segments []string) (*[2]float64, error) {
+func ParsePoint(segments []string) (*[]float64, error) {
 	if len(segments[0]) > 5 {
 		s := segments[0]
 		latInit, err := strconv.Atoi(s[0:4])
@@ -41,7 +41,7 @@ func ParsePoint(segments []string) (*[2]float64, error) {
 			lon = lon + -100
 		}
 
-		return &[2]float64{lon, lat}, nil
+		return &[]float64{lon, lat}, nil
 	} else {
 		if len(segments) > 2 {
 			return nil, errors.New("point string was not the correct size")
@@ -60,7 +60,7 @@ func ParsePoint(segments []string) (*[2]float64, error) {
 		if lon <= -180.0 {
 			lon = lon + 360.0
 		}
-		return &[2]float64{lon, lat}, nil
+		return &[]float64{lon, lat}, nil
 	}
 }
 
@@ -75,7 +75,7 @@ func ParseLatLon(text string) (*LatLon, error) {
 	segmentRegexp := regexp.MustCompile("[0-9]{4,}")
 	segments := segmentRegexp.FindAllString(original, -1)
 
-	points := [][2]float64{}
+	points := [][]float64{}
 	if len(segments[0]) > 5 {
 		for _, s := range segments {
 			point, err := ParsePoint([]string{s})
@@ -93,13 +93,13 @@ func ParseLatLon(text string) (*LatLon, error) {
 			points = append(points, *point)
 		}
 	}
-	if points[0] != points[len(points)-1] {
+	if points[0][0] != points[len(points)-1][0] || points[0][1] != points[len(points)-1][1] {
 		points = append(points, points[0])
 	}
 
 	polygon := PolygonFeature{
 		Type:        "Polygon",
-		Coordinates: [][][2]float64{points},
+		Coordinates: [][][]float64{points},
 	}
 
 	return &LatLon{
