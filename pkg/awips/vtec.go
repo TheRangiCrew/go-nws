@@ -234,8 +234,7 @@ func ParseVTEC(text string) ([]VTEC, []error) {
 }
 
 func (vtec *VTEC) PhenomenaString() string {
-	switch vtec.Phenomena {
-	case "FW":
+	if vtec.Phenomena == "FW" && vtec.Significance == "W" {
 		return "Red Flag"
 	}
 	return VTECPhenomena[vtec.Phenomena]
