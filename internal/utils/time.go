@@ -7,7 +7,7 @@ var Timezones = map[string]*time.Location{
 	"UTC":  time.FixedZone("UTC", 0*60*60),
 	"AST":  time.FixedZone("AST", -4*60*60),
 	"EST":  time.FixedZone("EST", -5*60*60),
-	"EDT":  time.FixedZone("EDT", -5*60*60),
+	"EDT":  time.FixedZone("EDT", -4*60*60),
 	"CST":  time.FixedZone("CST", -6*60*60),
 	"CDT":  time.FixedZone("CDT", -5*60*60),
 	"MST":  time.FixedZone("MST", -7*60*60),
