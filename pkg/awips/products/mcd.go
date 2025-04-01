@@ -19,6 +19,9 @@ type MCD struct {
 	Concerning       string               `json:"concerning"`
 	Polygon          awips.PolygonFeature `json:"polygon"`
 	WatchProbability int                  `json:"watch_probability"`
+	MostProbTornado  string               `json:"most_prob_tornado"`
+	MostProbGust     string               `json:"most_prob_gust"`
+	MostProbHail     string               `json:"mopst_prob_hail"`
 }
 
 func ParseMCD(text string) (*MCD, error) {
@@ -86,6 +89,39 @@ func ParseMCD(text string) (*MCD, error) {
 		}
 	}
 
+	probTornadoRegexp := regexp.MustCompile(`(MOST PROBABLE PEAK TORNADO INTENSITY\.\.\.)([\w ]+)`)
+	probTornadoString := probTornadoRegexp.FindString(text)
+	var probTornado string
+	if probTornadoString != "" {
+		values := strings.Split(probTornadoString, "...")
+		if len(values) < 2 {
+			return nil, fmt.Errorf("tornado probability string was found but split returned %d elements", len(values))
+		}
+		probTornado = values[1]
+	}
+
+	probGustRegexp := regexp.MustCompile(`(MOST PROBABLE PEAK TORNADO INTENSITY\.\.\.)([\w ]+)`)
+	probGustString := probGustRegexp.FindString(text)
+	var probGust string
+	if probGustString != "" {
+		values := strings.Split(probGustString, "...")
+		if len(values) < 2 {
+			return nil, fmt.Errorf("gust probability string was found but split returned %d elements", len(values))
+		}
+		probGust = values[1]
+	}
+
+	probHialRegexp := regexp.MustCompile(`(MOST PROBABLE PEAK TORNADO INTENSITY\.\.\.)([\w ]+)`)
+	probHailString := probHialRegexp.FindString(text)
+	var probHail string
+	if probHailString != "" {
+		values := strings.Split(probHailString, "...")
+		if len(values) < 2 {
+			return nil, fmt.Errorf("hail probability string was found but split returned %d elements", len(values))
+		}
+		probHail = values[1]
+	}
+
 	mcd := MCD{
 		Original:         text,
 		Number:           number,
@@ -94,6 +130,9 @@ func ParseMCD(text string) (*MCD, error) {
 		Concerning:       concerning,
 		Polygon:          *polygon,
 		WatchProbability: probability,
+		MostProbTornado:  probTornado,
+		MostProbGust:     probGust,
+		MostProbHail:     probHail,
 	}
 
 	return &mcd, nil
