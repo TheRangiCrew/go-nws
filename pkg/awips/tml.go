@@ -17,7 +17,7 @@ type TML struct {
 	Location    [2]float64 `json:"location"`
 }
 
-func ParseTML(text string, issued time.Time) (*TML, error) {
+func ParseTML(text string, issued time.Time) ([]TML, error) {
 	tmlRegexp := regexp.MustCompile(`(?m:^(TIME\.\.\.MOT\.\.\.LOC)([A-Za-z0-9 ]*))`)
 	original := tmlRegexp.FindString(text)
 
@@ -49,28 +49,34 @@ func ParseTML(text string, issued time.Time) (*TML, error) {
 		return nil, errors.New("could not parse speed in TML")
 	}
 
-	latInit, err := strconv.Atoi(segments[3])
-	if err != nil {
-		return nil, errors.New("failed to parse LAT...LON lat")
-	}
-	lonInit, err := strconv.Atoi(segments[4])
-	if err != nil {
-		return nil, errors.New("failed to parse LAT...LON lon")
+	tmls := []TML{}
+
+	for i := 3; i < len(segments); i += 2 {
+		latString, err := strconv.Atoi(segments[3])
+		if err != nil {
+			return nil, errors.New("failed to parse LAT...LON lat")
+		}
+		lonString, err := strconv.Atoi(segments[4])
+		if err != nil {
+			return nil, errors.New("failed to parse LAT...LON lon")
+		}
+
+		lat := float64(latString) / 100
+		lon := (float64(lonString) / 100) * -1
+		if lon <= -180.0 {
+			lon = lon + 360.0
+		}
+		location := [2]float64{lon, lat}
+
+		tmls = append(tmls, TML{
+			Original:    original,
+			Time:        time,
+			Direction:   direction,
+			Speed:       speed,
+			SpeedString: speedString,
+			Location:    location,
+		})
 	}
 
-	lat := float64(latInit) / 100
-	lon := (float64(lonInit) / 100) * -1
-	if lon <= -180.0 {
-		lon = lon + 360.0
-	}
-	location := [2]float64{lon, lat}
-
-	return &TML{
-		Original:    original,
-		Time:        time,
-		Direction:   direction,
-		Speed:       speed,
-		SpeedString: speedString,
-		Location:    location,
-	}, nil
+	return tmls, nil
 }
