@@ -36,7 +36,7 @@ type TextProductSegment struct {
 	Ends    time.Time         `json:"ends"`    // The event end time as defined in NWS Directive 10-1701
 	LatLon  *LatLon           `json:"latlon"`
 	Tags    map[string]string `json:"tags"`
-	TML     *TML              `json:"tml"`
+	TML     []TML             `json:"tml"`
 }
 
 // Attempts to parse the given text into a text product including segments & VTEC
