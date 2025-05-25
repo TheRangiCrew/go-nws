@@ -14,7 +14,7 @@ type TML struct {
 	Direction   int          `json:"direction"`
 	Speed       int          `json:"speed"`
 	SpeedString string       `json:"speedString"`
-	Location    [][2]float64 `json:"location"`
+	Locations   [][2]float64 `json:"location"`
 }
 
 func ParseTML(text string, issued time.Time) (*TML, error) {
@@ -55,7 +55,7 @@ func ParseTML(text string, issued time.Time) (*TML, error) {
 		Direction:   direction,
 		Speed:       speed,
 		SpeedString: speedString,
-		Location:    [][2]float64{},
+		Locations:   [][2]float64{},
 	}
 
 	for i := 3; i < len(segments); i += 2 {
@@ -75,7 +75,7 @@ func ParseTML(text string, issued time.Time) (*TML, error) {
 		}
 		location := [2]float64{lon, lat}
 
-		tml.Location = append(tml.Location, location)
+		tml.Locations = append(tml.Locations, location)
 	}
 
 	return &tml, nil
