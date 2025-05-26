@@ -20,7 +20,7 @@ type TML struct {
 
 func ParseTML(text string, issued time.Time) (*TML, error) {
 	tmlRegexp := regexp.MustCompile(`(?m:^(TIME\.\.\.MOT\.\.\.LOC)([A-Za-z0-9 ]*))`)
-	original := tmlRegexp.FindString(text)
+	original := strings.TrimSpace(tmlRegexp.FindString(text))
 
 	if original == "" {
 		return nil, nil
