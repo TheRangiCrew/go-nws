@@ -59,6 +59,7 @@ func ParseTML(text string, issued time.Time) (*TML, error) {
 		Locations:   [][2]float64{},
 	}
 
+	fmt.Println(segments)
 	fmt.Println(len(segments))
 
 	for i := 3; i < len(segments); i += 2 {
