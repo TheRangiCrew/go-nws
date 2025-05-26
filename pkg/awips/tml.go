@@ -2,6 +2,7 @@ package awips
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -58,6 +59,8 @@ func ParseTML(text string, issued time.Time) (*TML, error) {
 		Locations:   [][2]float64{},
 	}
 
+	fmt.Println(len(segments))
+
 	for i := 3; i < len(segments); i += 2 {
 		latString, err := strconv.Atoi(segments[i])
 		if err != nil {
@@ -76,6 +79,8 @@ func ParseTML(text string, issued time.Time) (*TML, error) {
 		location := [2]float64{lon, lat}
 
 		tml.Locations = append(tml.Locations, location)
+
+		fmt.Println(i)
 	}
 
 	return &tml, nil
