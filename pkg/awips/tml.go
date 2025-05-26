@@ -59,11 +59,11 @@ func ParseTML(text string, issued time.Time) (*TML, error) {
 	}
 
 	for i := 3; i < len(segments); i += 2 {
-		latString, err := strconv.Atoi(segments[3])
+		latString, err := strconv.Atoi(segments[i])
 		if err != nil {
 			return nil, errors.New("failed to parse LAT...LON lat")
 		}
-		lonString, err := strconv.Atoi(segments[4])
+		lonString, err := strconv.Atoi(segments[i+1])
 		if err != nil {
 			return nil, errors.New("failed to parse LAT...LON lon")
 		}
