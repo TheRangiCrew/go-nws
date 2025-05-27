@@ -58,7 +58,7 @@ func ParseTML(text string, issued time.Time) (*TML, error) {
 		Locations:   [][2]float64{},
 	}
 
-	for i := 3; i < len(segments); i += 2 {
+	for i := 3; i < len(segments)-1; i += 2 {
 		latString, err := strconv.Atoi(segments[i])
 		if err != nil {
 			return nil, errors.New("failed to parse LAT...LON lat")
